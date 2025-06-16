@@ -1,0 +1,25 @@
+{
+    "name": "daniel/laravel-telegram-error-reporter",
+    "description": "A Laravel package to report errors to Telegram",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "sindaniel\\TelegramErrorReporter\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.0",
+        "laravel/framework": "^9.0|^10.0|^12.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "sindaniel\\TelegramErrorReporter\\TelegramErrorReporterServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+} 
