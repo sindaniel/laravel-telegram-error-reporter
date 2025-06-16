@@ -1,5 +1,5 @@
 {
-    "name": "daniel/laravel-telegram-error-reporter",
+    "name": "sindaniel/laravel-telegram-error-reporter",
     "description": "A Laravel package to report errors to Telegram",
     "type": "library",
     "license": "MIT",
