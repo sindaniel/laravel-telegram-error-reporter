@@ -11,7 +11,7 @@
     "require": {
         "php": "^8.0",
         "laravel/framework": "^9.0|^10.0|^12.0",
-        "daniel/laravel-telegram-error-reporter": "main",
+        "daniel/laravel-telegram-error-reporter": "^1.0",
         "guzzlehttp/guzzle": "^7.0"
     },
     "extra": {
