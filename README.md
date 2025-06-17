@@ -1,98 +1,70 @@
 # Laravel Telegram Error Reporter
 
-Un paquete para Laravel que reporta automáticamente los errores 500 de tu aplicación a Telegram.
+A Laravel package that automatically reports your application's 500 errors to Telegram.
 
-## Instalación
+## Installation
 
-Instala el paquete via Composer:
+Install the package via Composer:
 
 ```bash
 composer require sindaniel/laravel-telegram-error-reporter
 ```
 
-Publica el archivo de configuración:
+Publish the configuration file:
 
 ```bash
 php artisan vendor:publish --provider="Sindaniel\LaravelTelegramErrorReporter\TelegramErrorReporterServiceProvider" --tag="config"
 ```
 
-## Configuración
+## Configuration
 
-### 1. Crear un Bot de Telegram
+### 1. Create a Telegram Bot
 
-1. Abre Telegram y busca `@BotFather`
-2. Envía `/newbot` y sigue las instrucciones
-3. Guarda el token que te proporciona BotFather
+1. Open Telegram and search for `@BotFather`
+2. Send `/newbot` and follow the instructions
+3. Save the token provided by BotFather
 
-### 2. Obtener el Chat ID
+### 2. Get the Chat ID
 
-Para obtener tu Chat ID personal:
-1. Busca `@userinfobot` en Telegram
-2. Envía `/start` y obtendrás tu Chat ID
+To get your personal Chat ID:
+1. Search for `@userinfobot` in Telegram
+2. Send `/start` and you'll get your Chat ID
 
-Para un grupo:
-1. Agrega tu bot al grupo
-2. Envía un mensaje cualquiera en el grupo
-3. Visita: `https://api.telegram.org/bot<TU_BOT_TOKEN>/getUpdates`
-4. Busca el `chat.id` en la respuesta
+For a group:
+1. Add your bot to the group
+2. Send any message in the group
+3. Visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+4. Look for the `chat.id` in the response
 
-### 3. Variables de Entorno
+### 3. Environment Variables
 
-Agrega estas variables a tu archivo `.env`:
+Add these variables to your `.env` file:
 
 ```env
-TELEGRAM_ERROR_BOT_TOKEN=tu_bot_token_aqui
-TELEGRAM_ERROR_CHAT_ID=tu_chat_id_aqui
+TELEGRAM_ERROR_BOT_TOKEN=your_bot_token_here
+TELEGRAM_ERROR_CHAT_ID=your_chat_id_here
 TELEGRAM_ERROR_ENABLED=true
 ```
 
-## Uso
+## Usage
 
-### Configuración Básica en bootstrap/app.php
+### Basic Configuration in bootstrap/app.php
 
-Reemplaza tu código actual con este:
+Replace your current code with this:
 
 ```php
 ->withExceptions(function (Exceptions $exceptions) {
     $exceptions->report(function (Throwable $e) {
-        // Tu código actual para logging
-        $errorData = [
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'url' => request()->fullUrl(),
-            'ip' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'timestamp' => now()->toDateTimeString(),
-            'session_id' => session()->getId(),
-        ];
-        
-        info($errorData);
-        
-        // Reportar a Telegram
+        // Report to Telegram
         app(\Sindaniel\LaravelTelegramErrorReporter\TelegramErrorReporter::class)
             ->report($e, $errorData);
     });
 });
 ```
 
-### Uso con Facade
+### Test the Configuration
 
-También puedes usar el facade en cualquier parte de tu código:
-
-```php
-use Sindaniel\LaravelTelegramErrorReporter\TelegramErrorReporterFacade as TelegramError;
-
-try {
-    // Tu código que puede fallar
-} catch (Exception $e) {
-    TelegramError::report($e, ['additional_context' => 'some value']);
-}
-```
-
-### Probar la Configuración
-
-Puedes probar si tu configuración funciona correctamente:
+You can test if your configuration works correctly:
 
 ```php
 use Sindaniel\LaravelTelegramErrorReporter\TelegramErrorReporterFacade as TelegramError;
@@ -101,49 +73,49 @@ $result = TelegramError::test();
 dd($result);
 ```
 
-## Configuración Avanzada
+## Advanced Configuration
 
-El archivo de configuración `config/telegram-error-reporter.php` contiene las siguientes opciones:
+The configuration file `config/telegram-error-reporter.php` contains the following options:
 
-### Filtros por Entorno
+### Environment Filters
 
 ```php
-'environments' => ['production'], // Solo reportar en producción
+'environments' => ['production'], // Only report in production
 ```
 
-### Limitación de Rate
+### Rate Limiting
 
 ```php
-'rate_limit_per_minute' => 5, // Máximo 5 errores por minuto
+'rate_limit_per_minute' => 5, // Maximum 5 errors per minute
 ```
 
-### Plantilla de Mensaje Personalizada
+### Custom Message Template
 
 ```php
-'message_template' => "🚨 *Error en {app_name}*\n\n" .
-                     "**Entorno:** {environment}\n" .
-                     "**Mensaje:** {message}\n" .
-                     "**Archivo:** {file}:{line}\n" .
+'message_template' => "🚨 *Error in {app_name}*\n\n" .
+                     "**Environment:** {environment}\n" .
+                     "**Message:** {message}\n" .
+                     "**File:** {file}:{line}\n" .
                      "**URL:** {url}\n" .
                      "**IP:** {ip}\n" .
-                     "**Tiempo:** {timestamp}",
+                     "**Time:** {timestamp}",
 ```
 
-Variables disponibles:
-- `{app_name}` - Nombre de la aplicación
-- `{environment}` - Entorno actual (production, local, etc.)
-- `{message}` - Mensaje del error
-- `{file}` - Archivo donde ocurrió el error
-- `{line}` - Línea donde ocurrió el error
-- `{url}` - URL donde ocurrió el error
-- `{ip}` - IP del usuario
-- `{user_agent}` - User agent del navegador
-- `{timestamp}` - Fecha y hora del error
-- `{session_id}` - ID de la sesión
+Available variables:
+- `{app_name}` - Application name
+- `{environment}` - Current environment (production, local, etc.)
+- `{message}` - Error message
+- `{file}` - File where the error occurred
+- `{line}` - Line where the error occurred
+- `{url}` - URL where the error occurred
+- `{ip}` - User's IP address
+- `{user_agent}` - Browser's user agent
+- `{timestamp}` - Date and time of the error
+- `{session_id}` - Session ID
 
-## Ejemplo de Artisan Command para Pruebas
+## Example Artisan Command for Testing
 
-Crea un comando de Artisan para probar el reporter:
+Create an Artisan command to test the reporter:
 
 ```bash
 php artisan make:command TestTelegramError
@@ -165,46 +137,46 @@ class TestTelegramError extends Command
     public function handle()
     {
         try {
-            // Crear un error de prueba
-            throw new \Exception('Este es un error de prueba para Telegram');
+            // Create a test error
+            throw new \Exception('This is a test error for Telegram');
         } catch (\Exception $e) {
             $result = TelegramError::report($e, [
-                'test_context' => 'Comando de prueba ejecutado',
-                'user' => 'Sistema'
+                'test_context' => 'Test command executed',
+                'user' => 'System'
             ]);
             
             if ($result) {
-                $this->info('✅ Error reportado exitosamente a Telegram');
+                $this->info('✅ Error successfully reported to Telegram');
             } else {
-                $this->error('❌ Error al reportar a Telegram');
+                $this->error('❌ Error reporting to Telegram failed');
             }
         }
     }
 }
 ```
 
-## Características
+## Features
 
-- ✅ Reportes automáticos de errores 500
-- ✅ Filtros por entorno (solo producción, staging, etc.)
-- ✅ Rate limiting para evitar spam
-- ✅ Plantillas de mensaje personalizables
-- ✅ Soporte para contexto adicional
-- ✅ Manejo seguro de errores (no causa errores adicionales)
-- ✅ Escape automático de caracteres especiales de Markdown
-- ✅ Timeout configurables para las peticiones HTTP
+- ✅ Automatic 500 error reporting
+- ✅ Environment filters (production only, staging, etc.)
+- ✅ Rate limiting to prevent spam
+- ✅ Customizable message templates
+- ✅ Additional context support
+- ✅ Safe error handling (doesn't cause additional errors)
+- ✅ Automatic escaping of Markdown special characters
+- ✅ Configurable timeouts for HTTP requests
 
-## Licencia
+## License
 
 MIT License
 
-## Contribuir
+## Contributing
 
-Las contribuciones son bienvenidas. Por favor, abre un issue o pull request.
+Contributions are welcome. Please open an issue or pull request.
 
 ## Changelog
 
 ### 1.0.0
-- Versión inicial
-- Reporte básico de errores a Telegram
-- Configuración via archivo de config y variables de entorno
+- Initial release
+- Basic error reporting to Telegram
+- Configuration via config file and environment variables
