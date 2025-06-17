@@ -1,30 +1,35 @@
 <?php
 
-namespace sindaniel\TelegramErrorReporter;
+namespace Sindaniel\LaravelTelegramErrorReporter;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use sindaniel\TelegramErrorReporter\TelegramErrorReporter;
 
 class TelegramErrorReporterServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        
         $this->mergeConfigFrom(
-            __DIR__.'/../config/telegram-error-reporter.php', 'telegram-error-reporter'
+            __DIR__.'/../config/telegram-error-reporter.php',
+            'telegram-error-reporter'
         );
+
+        $this->app->singleton(TelegramErrorReporter::class, function ($app) {
+       
+            return new TelegramErrorReporter(
+                config('telegram-error-reporter.bot_token'),
+                config('telegram-error-reporter.chat_id')
+            );
+        });
     }
 
     public function boot()
     {
-        $this->publishes([
-            __DIR__.'/../config/telegram-error-reporter.php' => config_path('telegram-error-reporter.php'),
-        ], 'config');
-
-        $this->app->make(ExceptionHandler::class)->reportable(function (\Throwable $e) {
-            if (app()->bound(TelegramErrorReporter::class)) {
-                app(TelegramErrorReporter::class)->report($e);
-            }
-        });
+        
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/telegram-error-reporter.php' => config_path('telegram-error-reporter.php'),
+            ], 'config');
+        }
     }
-} 
+}
