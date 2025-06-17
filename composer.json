@@ -2,11 +2,12 @@
     "name": "sindaniel/laravel-telegram-error-reporter",
     "description": "Laravel package to report application errors to Telegram",
     "type": "library",
+    "version": "1.0.0",
     "license": "MIT",
     "authors": [
         {
             "name": "sindaniel",
-            "email": "your-email@example.com"
+            "email": "sindanielweb@gmail.com"
         }
     ],
     "require": {
